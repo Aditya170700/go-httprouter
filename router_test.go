@@ -27,6 +27,7 @@ func TestRouter(t *testing.T) {
 	assert.Equal(t, "Test Hello HttpRouter", string(body))
 }
 
+// named parameter
 func TestRouterParams(t *testing.T) {
 	router := httprouter.New()
 
@@ -41,4 +42,21 @@ func TestRouterParams(t *testing.T) {
 
 	body, _ := io.ReadAll(recorder.Result().Body)
 	assert.Equal(t, "Product 1", string(body))
+}
+
+// catch all parameter
+func TestRouterCatchAllParams(t *testing.T) {
+	router := httprouter.New()
+
+	router.GET("/images/*path", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		fmt.Fprintf(w, "Images filepath %s", p.ByName("path"))
+	})
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080/images/var/www/html", nil)
+
+	router.ServeHTTP(recorder, request)
+
+	body, _ := io.ReadAll(recorder.Result().Body)
+	assert.Equal(t, "Images filepath /var/www/html", string(body))
 }

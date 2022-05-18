@@ -16,6 +16,9 @@ func main() {
 	router.GET("/products/:id", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		fmt.Fprintf(w, "Product %s", p.ByName("id"))
 	})
+	router.GET("/images/*path", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		fmt.Fprintf(w, "Images filepath %s", p.ByName("path"))
+	})
 
 	server := http.Server{
 		Handler: router,
