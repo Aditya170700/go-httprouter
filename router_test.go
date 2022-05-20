@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -59,4 +60,32 @@ func TestRouterCatchAllParams(t *testing.T) {
 
 	body, _ := io.ReadAll(recorder.Result().Body)
 	assert.Equal(t, "Images filepath /var/www/html", string(body))
+}
+
+func TestServeFilesHello(t *testing.T) {
+	router := httprouter.New()
+	directory, _ := fs.Sub(resources, "resources")
+	router.ServeFiles("/files/*filepath", http.FS(directory))
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080/files/hello.txt", nil)
+
+	router.ServeHTTP(recorder, request)
+
+	body, _ := io.ReadAll(recorder.Result().Body)
+	assert.Equal(t, "Hello", string(body))
+}
+
+func TestServeFilesGoodBye(t *testing.T) {
+	router := httprouter.New()
+	directory, _ := fs.Sub(resources, "resources")
+	router.ServeFiles("/files/*filepath", http.FS(directory))
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080/files/goodbye.txt", nil)
+
+	router.ServeHTTP(recorder, request)
+
+	body, _ := io.ReadAll(recorder.Result().Body)
+	assert.Equal(t, "Goodbye", string(body))
 }
