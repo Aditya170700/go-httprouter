@@ -12,6 +12,15 @@ import (
 //go:embed resources
 var resources embed.FS
 
+type LogMiddleware struct {
+	http.Handler
+}
+
+func (middleware *LogMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Receive request")
+	middleware.Handler.ServeHTTP(w, r)
+}
+
 func main() {
 	router := httprouter.New()
 

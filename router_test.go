@@ -140,3 +140,21 @@ func TestNotAllowedHandler(t *testing.T) {
 	body, _ := io.ReadAll(recorder.Result().Body)
 	assert.Equal(t, "HTTP Method Not Allowed", string(body))
 }
+
+func TestMiddleware(t *testing.T) {
+	router := httprouter.New()
+
+	router.GET("/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		fmt.Fprint(w, "Middleware")
+	})
+
+	middleware := LogMiddleware{Handler: router}
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080/", nil)
+
+	middleware.ServeHTTP(recorder, request)
+
+	body, _ := io.ReadAll(recorder.Result().Body)
+	assert.Equal(t, "Middleware", string(body))
+}
