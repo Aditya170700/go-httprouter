@@ -89,3 +89,21 @@ func TestServeFilesGoodBye(t *testing.T) {
 	body, _ := io.ReadAll(recorder.Result().Body)
 	assert.Equal(t, "Goodbye", string(body))
 }
+
+func TestPanicHandler(t *testing.T) {
+	router := httprouter.New()
+	router.PanicHandler = func(w http.ResponseWriter, r *http.Request, i interface{}) {
+		fmt.Fprint(w, "Panic : ", i)
+	}
+	router.GET("/", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		panic("Ups")
+	})
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080/", nil)
+
+	router.ServeHTTP(recorder, request)
+
+	body, _ := io.ReadAll(recorder.Result().Body)
+	assert.Equal(t, "Panic : Ups", string(body))
+}

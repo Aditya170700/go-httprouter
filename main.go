@@ -27,6 +27,15 @@ func main() {
 	directory, _ := fs.Sub(resources, "resources")
 	router.ServeFiles("/files/*filepath", http.FS(directory))
 
+	// panic handler
+	router.PanicHandler = func(w http.ResponseWriter, r *http.Request, i interface{}) {
+		fmt.Fprint(w, "Panic : ", i)
+	}
+
+	router.GET("/panic", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		panic("Ups")
+	})
+
 	server := http.Server{
 		Handler: router,
 		Addr:    "localhost:8080",
