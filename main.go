@@ -41,6 +41,15 @@ func main() {
 		fmt.Fprint(w, "Gak ketemu")
 	})
 
+	// http method not allowed handler
+	router.MethodNotAllowed = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "HTTP Method Not Allowed")
+	})
+
+	router.POST("/test-post", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		fmt.Fprint(w, "Test Post")
+	})
+
 	server := http.Server{
 		Handler: router,
 		Addr:    "localhost:8080",

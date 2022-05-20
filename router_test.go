@@ -122,3 +122,21 @@ func TestNotFoundHandler(t *testing.T) {
 	body, _ := io.ReadAll(recorder.Result().Body)
 	assert.Equal(t, "Gak ketemu", string(body))
 }
+
+func TestNotAllowedHandler(t *testing.T) {
+	router := httprouter.New()
+	router.MethodNotAllowed = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "HTTP Method Not Allowed")
+	})
+	router.POST("/", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		fmt.Fprint(w, "Wkwkwk")
+	})
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080/", nil)
+
+	router.ServeHTTP(recorder, request)
+
+	body, _ := io.ReadAll(recorder.Result().Body)
+	assert.Equal(t, "HTTP Method Not Allowed", string(body))
+}
