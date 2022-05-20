@@ -107,3 +107,18 @@ func TestPanicHandler(t *testing.T) {
 	body, _ := io.ReadAll(recorder.Result().Body)
 	assert.Equal(t, "Panic : Ups", string(body))
 }
+
+func TestNotFoundHandler(t *testing.T) {
+	router := httprouter.New()
+	router.NotFound = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "Gak ketemu")
+	})
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:8080/", nil)
+
+	router.ServeHTTP(recorder, request)
+
+	body, _ := io.ReadAll(recorder.Result().Body)
+	assert.Equal(t, "Gak ketemu", string(body))
+}

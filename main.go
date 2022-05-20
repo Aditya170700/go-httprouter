@@ -36,6 +36,11 @@ func main() {
 		panic("Ups")
 	})
 
+	// not found handler
+	router.NotFound = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "Gak ketemu")
+	})
+
 	server := http.Server{
 		Handler: router,
 		Addr:    "localhost:8080",
